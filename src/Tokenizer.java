@@ -1,12 +1,13 @@
 import java.util.Vector;
-import java.io.File;                  
-import java.io.FileNotFoundException; 
-import java.util.Scanner; 
 
-public class StofCompiler {
-
+public class Tokenizer {
+    ///////////////////////
+    /// UTILITY CLASSES ///
+    ///////////////////////
     public enum TokenType {
-        STOF_RETURN, STOF_INT_LITERAL, STOF_SEMICOLON
+        STOF_RETURN,
+        STOF_INT_LITERAL,
+        STOF_SEMICOLON
     }
 
     public static class Token {
@@ -14,7 +15,7 @@ public class StofCompiler {
         String value;
         public Token(TokenType type) {
             this.type = type;
-        }
+        } // Constructor for TokenType that doesn't require a value.
         public Token(TokenType type,  String value) {
             this.type = type;
             this.value = value;
@@ -30,6 +31,9 @@ public class StofCompiler {
         }
     }
 
+    //////////////////////
+    /// HELPER METHODS ///
+    //////////////////////
     public static String vectorToString(Vector<Character> buffer) {
         StringBuilder sb = new StringBuilder();
         for (Character c : buffer) {
@@ -37,7 +41,9 @@ public class StofCompiler {
         }
         return sb.toString();
     }
-
+    /// /////////////////
+    /// TOKENIZE FILE ///
+    /////////////////////
     public static Vector<Token> tokenize(String file) {
         Vector<Character> buffer = new Vector<>();
         Vector<Token> tokens = new Vector<>();
@@ -51,7 +57,6 @@ public class StofCompiler {
                     i++;
                 }
                 i--;
-
                 if (vectorToString(buffer).equals("return")) {
                     Token token = new Token(TokenType.STOF_RETURN);
                     tokens.add(token);
@@ -67,7 +72,6 @@ public class StofCompiler {
                     i++;
                 }
                 i--;
-
                 Token token = new Token(TokenType.STOF_INT_LITERAL, vectorToString(buffer));
                 tokens.add(token);
                 buffer.clear();
@@ -76,7 +80,7 @@ public class StofCompiler {
                 Token token = new Token(TokenType.STOF_SEMICOLON);
                 tokens.add(token);
                 buffer.clear();
-            } 
+            }
             else if (Character.isWhitespace(file.charAt(i))) {
                 continue;
             } else {
@@ -84,36 +88,5 @@ public class StofCompiler {
             }
         }
         return tokens;
-    }
-
-    public static String tokensToAsm(Vector<Token> tokens) {
-        String output = ".global _start\n_start:";
-        
-        for (Token t : tokens) {
-            if (t.type == TokenType.STOF_RETURN) {
-                output += "";
-            }
-        }
-
-        return output;
-    }
-
-    public static void main(String[] args) {
-      File file = new File("stof/main.stof");
-      String fileString = "";
-      try (Scanner reader = new Scanner(file)) {
-        while (reader.hasNextLine()) {
-            String data  = reader.nextLine();
-            fileString += data;
-        }
-      } catch (FileNotFoundException e) {
-        System.out.println("An error has occurred.");
-        e.printStackTrace();
-      }
-
-      Vector<Token> tokens = tokenize(fileString);
-      for (Token t : tokens) {
-        System.out.println(t.toString());
-      }
     }
 }
