@@ -5,9 +5,39 @@ public class Tokenizer {
     /// UTILITY CLASSES ///
     ///////////////////////
     public enum TokenType {
-        STOF_RETURN,
+        STOF_EXIT,
         STOF_INT_LITERAL,
-        STOF_SEMICOLON
+        STOF_SEMICOLON,
+        STOF_OPEN_PARENTHESIS,
+        STOF_CLOSE_PARENTHESIS,
+        STOF_IDENTIFIER,
+        STOF_LET,
+        STOF_EQUALS,
+        STOF_PLUS,
+        STOF_MINUS,
+        STOF_MULTIPLY,
+        STOF_DIVIDE,
+        STOF_OPEN_CURLY_BRACKET,
+        STOF_CLOSE_CURLY_BRACKET,
+        STOF_IF,
+        STOF_ELIF,
+        STOF_ELSE,
+        STOF_OPEN_SQUARE_BRACKET,
+        STOF_CLOSE_SQUARE_BRACKET,
+        STOF_RETURN,
+        STOF_MODULO,
+        STOF_FOR,
+        STOF_WHILE,
+        STOF_SWITCH,
+        STOF_CASE,
+        STOF_VAR,
+        STOF_INT,
+        STOF_CLASS,
+        STOF_BOOLEAN,
+        STOF_GREATER_THAN,
+        STOF_LESS_THAN,
+        STOF_GREATER_THAN_OR_EQUAL,
+        STOF_LESS_THAN_OR_EQUAL,
     }
 
     public static class Token {
@@ -15,6 +45,10 @@ public class Tokenizer {
         String value;
         public Token(TokenType type) {
             this.type = type;
+        }
+        public Token(TokenType type, String[] split) {
+            this.type = type;
+            this.value = split[0];
         } // Constructor for TokenType that doesn't require a value.
         public Token(TokenType type,  String value) {
             this.type = type;
@@ -23,70 +57,130 @@ public class Tokenizer {
 
         @Override
         public String toString() {
-            if (value != null) {
-                return "Token Type: " + type + " , Token Value: " + value;
-            } else {
-                return "Token Type: " + type;
-            }
+            return switch (type) {
+                case STOF_EXIT -> "exit";
+                case STOF_INT_LITERAL -> value;
+                case STOF_SEMICOLON -> ";";
+                case STOF_OPEN_PARENTHESIS -> "(";
+                case STOF_CLOSE_PARENTHESIS -> ")";
+                case STOF_IDENTIFIER -> "identifier";
+                case STOF_LET -> "let";
+                case STOF_EQUALS -> "=";
+                case STOF_PLUS -> "+";
+                case STOF_MINUS -> "-";
+                case STOF_MULTIPLY -> "*";
+                case STOF_DIVIDE -> "/";
+                case STOF_OPEN_CURLY_BRACKET -> "{";
+                case STOF_CLOSE_CURLY_BRACKET -> "}";
+                case STOF_IF -> "if";
+                case STOF_ELIF -> "elif";
+                case STOF_ELSE -> "else";
+                case STOF_OPEN_SQUARE_BRACKET -> "[";
+                case STOF_CLOSE_SQUARE_BRACKET -> "]";
+                case STOF_RETURN -> "return";
+                case STOF_MODULO -> "%";
+                case STOF_FOR -> "for";
+                case STOF_WHILE -> "while";
+                case STOF_SWITCH -> "switch";
+                case STOF_CASE -> "case";
+                case STOF_VAR -> "var";
+                case STOF_INT -> "int";
+                case STOF_CLASS -> "class";
+                case STOF_BOOLEAN -> "boolean";
+                case STOF_GREATER_THAN -> ">";
+                case STOF_LESS_THAN -> "<";
+                case STOF_GREATER_THAN_OR_EQUAL -> ">=";
+                case STOF_LESS_THAN_OR_EQUAL -> "<=";
+            };
         }
     }
 
-    //////////////////////
-    /// HELPER METHODS ///
-    //////////////////////
-    public static String vectorToString(Vector<Character> buffer) {
-        StringBuilder sb = new StringBuilder();
-        for (Character c : buffer) {
-            sb.append(c);
-        }
-        return sb.toString();
-    }
     /// /////////////////
     /// TOKENIZE FILE ///
     /////////////////////
     public static Vector<Token> tokenize(String file) {
-        Vector<Character> buffer = new Vector<>();
         Vector<Token> tokens = new Vector<>();
-        for (int i = 0; i < file.length(); i++) {
+        int i = 0;
+        while (i < file.length()) {
             char c = file.charAt(i);
-            if (Character.isAlphabetic(c)) {
-                buffer.add(c);
+
+            // skip whitespace
+            if (Character.isWhitespace(c)) {
                 i++;
-                while (Character.isLetterOrDigit(file.charAt(i))) {
-                    buffer.add(file.charAt(i));
-                    i++;
-                }
-                i--;
-                if (vectorToString(buffer).equals("return")) {
-                    Token token = new Token(TokenType.STOF_RETURN);
-                    tokens.add(token);
-                    buffer.clear();
-                } else {
-                    System.out.println("An error has occurred.");
-                }
-            } else if (Character.isDigit(file.charAt(i))) {
-                buffer.add(c);
-                i++;
-                while (Character.isDigit(file.charAt(i))) {
-                    buffer.add(file.charAt(i));
-                    i++;
-                }
-                i--;
-                Token token = new Token(TokenType.STOF_INT_LITERAL, vectorToString(buffer));
-                tokens.add(token);
-                buffer.clear();
-            } else if (c == ';') {
-                buffer.add(c);
-                Token token = new Token(TokenType.STOF_SEMICOLON);
-                tokens.add(token);
-                buffer.clear();
-            }
-            else if (Character.isWhitespace(file.charAt(i))) {
                 continue;
-            } else {
-                System.out.println("An error has occurred.");
             }
+
+            if (Character.isAlphabetic(c)) { // check if the first character is a letter
+                StringBuilder buffer = new StringBuilder();
+                buffer.append(c);
+                i++;
+                while (i < file.length() && Character.isLetterOrDigit(file.charAt(i))) { //while the next character is a letter or a digit
+                    buffer.append(file.charAt(i));
+                    i++;
+                }
+                String word = buffer.toString();
+
+                // identify keywords
+                switch (buffer.toString()) {
+                    // variable types
+                    case "int" -> tokens.add(new Token(TokenType.STOF_INT));
+                    case "let" -> tokens.add(new Token(TokenType.STOF_LET));
+                    case "var" -> tokens.add(new Token(TokenType.STOF_VAR));
+                    case "boolean" -> tokens.add(new Token(TokenType.STOF_BOOLEAN));
+
+                    // return statements
+                    case "exit" -> tokens.add(new Token(TokenType.STOF_EXIT));
+                    case "return" -> tokens.add(new Token(TokenType.STOF_RETURN));
+
+                    // conditional statements
+                    case "if" -> tokens.add(new Token(TokenType.STOF_IF));
+                    case "elif" -> tokens.add(new Token(TokenType.STOF_ELIF));
+                    case "else" -> tokens.add(new Token(TokenType.STOF_ELSE));
+                    case "switch" -> tokens.add(new Token(TokenType.STOF_SWITCH));
+                    case "case" -> tokens.add(new Token(TokenType.STOF_CASE));
+
+                    // loops
+                    case "for" -> tokens.add(new Token(TokenType.STOF_FOR));
+                    case "while" -> tokens.add(new Token(TokenType.STOF_WHILE));
+
+                    // class
+                    case "class" -> tokens.add(new Token(TokenType.STOF_CLASS));
+
+                    // variable or class names
+                    default -> tokens.add(new Token(TokenType.STOF_IDENTIFIER, word));
+                }
+                continue;
+            }
+
+            switch (c) {
+                case '(' -> tokens.add(new Token(TokenType.STOF_OPEN_PARENTHESIS));
+                case ')' -> tokens.add(new Token(TokenType.STOF_CLOSE_PARENTHESIS));
+                case '[' -> tokens.add(new Token(TokenType.STOF_OPEN_SQUARE_BRACKET));
+                case ']' -> tokens.add(new Token(TokenType.STOF_CLOSE_SQUARE_BRACKET));
+                case '{' -> tokens.add(new Token(TokenType.STOF_OPEN_CURLY_BRACKET));
+                case '}' -> tokens.add(new Token(TokenType.STOF_CLOSE_CURLY_BRACKET));
+                case '='  -> tokens.add(new Token(TokenType.STOF_EQUALS));
+                case '+'  -> tokens.add(new Token(TokenType.STOF_PLUS));
+                case '-'  -> tokens.add(new Token(TokenType.STOF_MINUS));
+                case '*'  -> tokens.add(new Token(TokenType.STOF_MULTIPLY));
+                case '/'  -> tokens.add(new Token(TokenType.STOF_DIVIDE));
+                case '<'  -> tokens.add(new Token(TokenType.STOF_GREATER_THAN));
+                case '>'  -> tokens.add(new Token(TokenType.STOF_LESS_THAN));
+                case ';' -> tokens.add(new Token(TokenType.STOF_SEMICOLON));
+            }
+
+            if (Character.isDigit(c)) { // executes if the first character is NOT a letter, checks if it is a digit
+                StringBuilder number = new StringBuilder();
+                while (i < file.length() && Character.isDigit(file.charAt(i))) { // while the next character is a digit
+                    number.append(file.charAt(i)); // add to the buffer
+                    i++; // increment i
+                }
+                tokens.add(new Token(TokenType.STOF_INT_LITERAL, number.toString()));
+                continue;
+            }
+
+            i++;
         }
-        return tokens;
+        return tokens; // return list of tokens
     }
 }
