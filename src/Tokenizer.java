@@ -1,6 +1,19 @@
 import java.util.Vector;
 
 public class Tokenizer {
+    /// //////////////////////
+    /// INSTANCE VARIABLES ///
+    //////////////////////////
+    private final String m_src;
+
+    ///////////////////
+    /// CONSTRUCTOR ///
+    /// ///////////////
+    public Tokenizer(String src) {
+        this.m_src = src;
+    }
+
+
     ///////////////////////
     /// UTILITY CLASSES ///
     ///////////////////////
@@ -26,6 +39,9 @@ public class Tokenizer {
         STOF_LESS_THAN,
         STOF_GREATER_THAN_OR_EQUAL,
         STOF_LESS_THAN_OR_EQUAL,
+        STOF_INCREMENT,
+        STOF_DECREMENT,
+
 
         // basic syntax
         STOF_OPEN_PARENTHESIS,
@@ -34,6 +50,7 @@ public class Tokenizer {
         STOF_CLOSE_CURLY_BRACKET,
         STOF_OPEN_SQUARE_BRACKET,
         STOF_CLOSE_SQUARE_BRACKET,
+        STOF_COMMA,
         STOF_SEMICOLON,
 
         // class
@@ -94,6 +111,8 @@ public class Tokenizer {
                 case STOF_LESS_THAN -> "<";
                 case STOF_GREATER_THAN_OR_EQUAL -> ">=";
                 case STOF_LESS_THAN_OR_EQUAL -> "<=";
+                case STOF_INCREMENT -> "++";
+                case STOF_DECREMENT -> "--";
 
                 // basic syntax
                 case STOF_OPEN_PARENTHESIS -> "(";
@@ -102,6 +121,7 @@ public class Tokenizer {
                 case STOF_CLOSE_CURLY_BRACKET -> "}";
                 case STOF_OPEN_SQUARE_BRACKET -> "[";
                 case STOF_CLOSE_SQUARE_BRACKET -> "]";
+                case STOF_COMMA -> ",";
                 case STOF_SEMICOLON -> ";";
 
                 // class
@@ -128,11 +148,11 @@ public class Tokenizer {
     /// /////////////////
     /// TOKENIZE FILE ///
     /////////////////////
-    public static Vector<Token> tokenize(String file) {
+    public Vector<Token> tokenize() {
         Vector<Token> tokens = new Vector<>();
         int i = 0;
-        while (i < file.length()) {
-            char c = file.charAt(i);
+        while (i < m_src.length()) {
+            char c = m_src.charAt(i);
 
             // skip whitespace
             if (Character.isWhitespace(c)) {
@@ -144,8 +164,8 @@ public class Tokenizer {
                 StringBuilder buffer = new StringBuilder();
                 buffer.append(c);
                 i++;
-                while (i < file.length() && Character.isLetterOrDigit(file.charAt(i))) { //while the next character is a letter or a digit
-                    buffer.append(file.charAt(i));
+                while (i < m_src.length() && Character.isLetterOrDigit(m_src.charAt(i))) { //while the next character is a letter or a digit
+                    buffer.append(m_src.charAt(i));
                     i++;
                 }
                 String word = buffer.toString();
@@ -190,12 +210,27 @@ public class Tokenizer {
                 case '}' -> tokens.add(new Token(TokenType.STOF_CLOSE_CURLY_BRACKET));
                 case '[' -> tokens.add(new Token(TokenType.STOF_OPEN_SQUARE_BRACKET));
                 case ']' -> tokens.add(new Token(TokenType.STOF_CLOSE_SQUARE_BRACKET));
+                case ',' -> tokens.add(new Token(TokenType.STOF_COMMA));
                 case ';' -> tokens.add(new Token(TokenType.STOF_SEMICOLON));
 
                 // operators
                 case '=' -> tokens.add(new Token(TokenType.STOF_EQUALS));
-                case '+' -> tokens.add(new Token(TokenType.STOF_PLUS));
-                case '-' -> tokens.add(new Token(TokenType.STOF_MINUS));
+                case '+' -> {
+                    if (i + 1 < m_src.length() && m_src.charAt(i + 1) == '+') {
+                        tokens.add(new Token(TokenType.STOF_INCREMENT));
+                        i++; // consume the second '+'
+                    } else {
+                        tokens.add(new Token(TokenType.STOF_PLUS));
+                    }
+                }
+                case '-' -> {
+                    if (i + 1 < m_src.length() && m_src.charAt(i + 1) == '-') {
+                        tokens.add(new Token(TokenType.STOF_DECREMENT));
+                        i++; // consume the second '-'
+                    } else {
+                        tokens.add(new Token(TokenType.STOF_MINUS));
+                    }
+                }
                 case '*' -> tokens.add(new Token(TokenType.STOF_MULTIPLY));
                 case '/' -> tokens.add(new Token(TokenType.STOF_DIVIDE));
                 case '%' -> tokens.add(new Token(TokenType.STOF_MODULO));
@@ -208,8 +243,8 @@ public class Tokenizer {
 
             if (Character.isDigit(c)) { // executes if the first character is NOT a letter, checks if it is a digit
                 StringBuilder number = new StringBuilder();
-                while (i < file.length() && Character.isDigit(file.charAt(i))) { // while the next character is a digit
-                    number.append(file.charAt(i)); // add to the buffer
+                while (i < m_src.length() && Character.isDigit(m_src.charAt(i))) { // while the next character is a digit
+                    number.append(m_src.charAt(i)); // add to the buffer
                     i++; // increment i
                 }
                 tokens.add(new Token(TokenType.STOF_INT_LITERAL, number.toString()));
