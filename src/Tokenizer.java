@@ -1,5 +1,6 @@
 import java.util.Vector;
 
+@SuppressWarnings("ClassCanBeRecord")
 public class Tokenizer {
     /// //////////////////////
     /// INSTANCE VARIABLES ///
@@ -12,7 +13,6 @@ public class Tokenizer {
     public Tokenizer(String src) {
         this.m_src = src;
     }
-
 
     ///////////////////////
     /// UTILITY CLASSES ///
@@ -72,19 +72,9 @@ public class Tokenizer {
         STOF_IDENTIFIER,
     }
 
-    public static class Token {
-        TokenType type;
-        String value;
+    public record Token(TokenType type, String value) {
         public Token(TokenType type) {
-            this.type = type;
-        }
-        public Token(TokenType type, String[] split) {
-            this.type = type;
-            this.value = split[0];
-        } // Constructor for TokenType that doesn't require a value.
-        public Token(TokenType type,  String value) {
-            this.type = type;
-            this.value = value;
+            this(type, null);
         }
 
         @Override
