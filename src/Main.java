@@ -3,13 +3,12 @@ import java.io.FileNotFoundException;
 import java.util.Scanner;
 import java.util.Vector;
 
+// main entry point for the Stof Compiler
 void main() {
-    System.out.println("OS: " + System.getProperty("os.name"));
-    System.out.println();
+    File sourceCode = new File("stof/main.stof"); // grab the source code
+    StringBuilder fileString = new StringBuilder(); // initialize a string builder to store the .stof file as a string
 
-    File sourceCode = new File("stof/main.stof");
-    StringBuilder fileString = new StringBuilder();
-
+    // go through each line of the .stof file and append it to the string
     try (Scanner reader = new Scanner(sourceCode)) {
         while (reader.hasNextLine()) {
             String data = reader.nextLine();
@@ -20,30 +19,20 @@ void main() {
         return;
     }
 
-    // Step 1: Tokenize
-    System.out.println("========== TOKENIZATION ==========");
+    // tokenize the source code. this assigns a keyword for every single word within the original source code
     Tokenizer tokenizer = new Tokenizer(fileString.toString());
     Vector<Tokenizer.Token> tokens = tokenizer.tokenize();
 
-    System.out.println("Tokens:");
-    for (Tokenizer.Token token : tokens) {
-        System.out.print(token + " ");
-    }
-    System.out.println();
-
-    // Step 2: Parse
-    System.out.println("========== PARSING ==========");
+    // parse the tokens returned from the Tokenizer class
     Parser parser = new Parser(tokens);
-
     try {
-        ParseTree.ProgramNode program = parser.parse();
+        ParseTree.ProgramNode program = parser.parse(); // contains the entire Stof program
 
-        // Step 3: Write parse tree to file
+        // TODO: delete this, this is for testing purposes only
+        // write parseTree to a txt file for debugging purposes
         String sourceFileName = sourceCode.getName().replace(".stof", "");
         String outputPath = "stof/" + sourceFileName + "_parse_tree.txt";
         parser.writeParseTreeToFile(program, outputPath);
-        System.out.println("Parse tree written to: " + outputPath);
-
     } catch (RuntimeException e) {
         System.out.println("Parse error: " + e.getMessage());
         e.printStackTrace();
