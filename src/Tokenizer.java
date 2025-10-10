@@ -69,6 +69,7 @@ public class Tokenizer {
 
         // numbers and variable names
         STOF_INT_LITERAL,
+        STOF_BOOLEAN_LITERAL,
         STOF_IDENTIFIER,
     }
 
@@ -130,6 +131,7 @@ public class Tokenizer {
 
                 // numbers and variable names
                 case STOF_INT_LITERAL -> value;
+                case STOF_BOOLEAN_LITERAL -> value;
                 case STOF_IDENTIFIER -> "identifier";
             };
         }
@@ -167,6 +169,10 @@ public class Tokenizer {
                     case "let" -> tokens.add(new Token(TokenType.STOF_LET));
                     case "var" -> tokens.add(new Token(TokenType.STOF_VAR));
                     case "boolean" -> tokens.add(new Token(TokenType.STOF_BOOLEAN));
+
+                    // boolean literals
+                    case "true" -> tokens.add(new Token(TokenType.STOF_BOOLEAN_LITERAL, "true"));
+                    case "false" -> tokens.add(new Token(TokenType.STOF_BOOLEAN_LITERAL, "false"));
 
                     // return statements
                     case "exit" -> tokens.add(new Token(TokenType.STOF_EXIT));

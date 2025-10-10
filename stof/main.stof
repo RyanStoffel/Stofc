@@ -1,15 +1,14 @@
 class main {
     int main() {
-
-        print(isNumberOneGreaterThanNumberTwo(2, 5);
+        print(isNumberOneGreaterThanNumberTwo(2, 5));
         int i = 0;
-        print(incrementVariable(i);
+        print(incrementVariable(i));
 
         return 0;
     }
 
     boolean isNumberOneGreaterThanNumberTwo(int numberOne, int numberTwo) {
-        if (number1 > number2) {
+        if (numberOne > numberTwo) {
             return true;
         } else {
             return false;
@@ -30,5 +29,6 @@ class main {
         } elif (num1 < num2) {
             num = num2;
         }
+        return num;
     }
 }
