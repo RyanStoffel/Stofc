@@ -1,3 +1,5 @@
+import org.jetbrains.annotations.NotNull;
+
 import java.util.Vector;
 
 @SuppressWarnings("ClassCanBeRecord")
@@ -79,7 +81,7 @@ public class Tokenizer {
         }
 
         @Override
-        public String toString() {
+        public @NotNull String toString() {
             return switch (type) {
                 // variable types
                 case STOF_INT -> "int";
